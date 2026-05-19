@@ -3,6 +3,8 @@ import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 import type { ClientToServerEvents, ServerToClientEvents } from '@mafia/shared';
 import { registerLobbyHandlers } from './handlers/lobby.js';
+import { registerLiveKitHandlers } from './handlers/livekit.js';
+import { isLiveKitConfigured } from './livekit/admin.js';
 
 const PORT = Number(process.env.PORT ?? 4000);
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? 'http://localhost:3000';
@@ -24,6 +26,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(http, {
 io.on('connection', (socket) => {
   console.log(`[socket] connected ${socket.id}`);
   registerLobbyHandlers(io, socket);
+  registerLiveKitHandlers(io, socket);
   socket.on('disconnect', (reason) => {
     console.log(`[socket] disconnected ${socket.id} (${reason})`);
   });
@@ -31,4 +34,9 @@ io.on('connection', (socket) => {
 
 http.listen(PORT, () => {
   console.log(`[server] listening on :${PORT} (CORS origin: ${WEB_ORIGIN})`);
+  if (!isLiveKitConfigured()) {
+    console.warn(
+      '[server] LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET not set — video/voice disabled. Sign up at https://cloud.livekit.io and update apps/server/.env',
+    );
+  }
 });

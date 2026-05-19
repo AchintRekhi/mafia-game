@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { RoomView } from '@mafia/shared';
+import { VideoRoom } from './VideoRoom';
 
 interface Props {
   room: RoomView;
@@ -42,6 +43,10 @@ export function Lobby({ room, myId }: Props) {
           {copied ? 'Copied!' : 'Tap to copy — share with your friends.'}
         </p>
       </header>
+
+      <section>
+        <VideoRoom />
+      </section>
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between">
