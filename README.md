@@ -25,3 +25,4 @@ pnpm dev                    # web + server in parallel
 ## Contributing
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CLAUDE.md`](CLAUDE.md). All work happens on `feature/*` branches and merges to `main` only on approval.
+# mafia-game
