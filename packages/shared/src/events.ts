@@ -34,6 +34,14 @@ export interface ClientToServerEvents {
   'host:start': () => void;
   'host:setPreset': (preset: TimingPreset) => void;
 
+  'livekit:requestToken': (
+    ack: (
+      res:
+        | { ok: true; token: string; url: string; identity: string }
+        | { ok: false; error: string },
+    ) => void,
+  ) => void;
+
   'mafia:pickTarget': (targetId: string) => void;
   'doctor:protect': (targetId: string) => void;
   'detective:investigate': (targetId: string) => void;
