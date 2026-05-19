@@ -22,12 +22,15 @@ export interface RoomView {
   players: PlayerView[];
 }
 
+export type JoinAck =
+  | { ok: true; you: { id: string }; code: string }
+  | { ok: false; error: string };
+
 /** Client → server */
 export interface ClientToServerEvents {
-  'room:join': (
-    payload: { code: string; name: string },
-    ack: (res: { ok: true; you: { id: string } } | { ok: false; error: string }) => void,
-  ) => void;
+  'room:create': (payload: { name: string }, ack: (res: JoinAck) => void) => void;
+  'room:join': (payload: { code: string; name: string }, ack: (res: JoinAck) => void) => void;
+  'room:leave': () => void;
   'host:start': () => void;
   'host:setPreset': (preset: TimingPreset) => void;
 
