@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { RoomView } from '@mafia/shared';
 import { VideoRoom } from './VideoRoom';
+import { getSocket } from '@/lib/socket';
 
 interface Props {
   room: RoomView;
@@ -80,6 +81,7 @@ export function Lobby({ room, myId }: Props) {
       <footer className="flex flex-col items-center gap-3">
         {iAmHost ? (
           <button
+            onClick={() => getSocket().emit('host:start')}
             disabled={!canStart}
             className="rounded bg-mafia px-10 py-3 font-display text-lg tracking-widest text-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
             title={canStart ? 'Start the game' : `Need at least ${MIN_PLAYERS} players`}
@@ -89,9 +91,6 @@ export function Lobby({ room, myId }: Props) {
         ) : (
           <p className="text-sm text-stone-400">Waiting for the host to start…</p>
         )}
-        <p className="text-xs text-stone-500">
-          Role assignment + the night phase land in <code>feature/role-assignment</code>.
-        </p>
       </footer>
     </main>
   );

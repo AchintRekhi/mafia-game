@@ -94,6 +94,25 @@ export function getRoomByCode(code: string): Room | undefined {
   return rooms.get(code.toUpperCase());
 }
 
+export function startGame(code: string, byHostSocketId: string):
+  | { ok: true; room: Room }
+  | { ok: false; error: string } {
+  const room = rooms.get(code.toUpperCase());
+  if (!room) return { ok: false, error: 'Room not found' };
+  if (room.hostId !== byHostSocketId) return { ok: false, error: 'Only the host can start' };
+  if (room.phase !== 'lobby') return { ok: false, error: 'Game already started' };
+  if (room.players.length < 6) return { ok: false, error: 'Need at least 6 players' };
+  return { ok: true, room };
+}
+
+export function setPhase(code: string, phase: Room['phase'], endsAt: number | null = null): Room | null {
+  const room = rooms.get(code.toUpperCase());
+  if (!room) return null;
+  room.phase = phase;
+  room.phaseEndsAt = endsAt;
+  return room;
+}
+
 export function leaveRoom(socketId: string): { room: Room; wasHost: boolean } | null {
   const code = socketToRoom.get(socketId);
   if (!code) return null;

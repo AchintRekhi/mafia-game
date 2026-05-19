@@ -20,3 +20,11 @@ All notable changes to this project will be documented here. Format follows [Kee
   - Socket event `livekit:requestToken` returns a token + URL for the joined room. `canPublish` is gated on `alive` so dead players get listen-only tokens.
   - Client: `VideoRoom` component mounts `LiveKitRoom` with a grid layout and minimal control bar (mic/cam toggles). Renders a configuration hint if env vars are missing.
   - Video tiles now show in the lobby; server logs a warning at boot if LiveKit env vars aren't set.
+- **Role assignment:**
+  - `game/roles.ts`: Fisher-Yates shuffle + balance-table distribution (validated against `BALANCE_TABLE`).
+  - `host:start` socket event: host-only, gated at ≥6 players. Server assigns roles, emits a private `role:assigned` to each socket, then broadcasts the personalized room state — Mafia now sees other Mafia, everyone else sees `???`.
+  - Client: `RoleReveal` component (Framer Motion card flip + role color glow) plays for 6s after assignment.
+  - `InGame` view replaces Lobby once `phase !== 'lobby'`; player list shows a `RoleChip` beside each name with asymmetric visibility.
+
+### Changed
+- `CLAUDE.md` trimmed to current project rules (branching default switched to direct-to-`main`).
