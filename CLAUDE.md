@@ -6,25 +6,33 @@ This file is the source of truth for how Claude Code should behave in this repo.
 
 ## 🔒 Branching Rule (MUST FOLLOW)
 
-**Never commit to `main` directly.** All new work happens on a feature branch.
+**Never commit to `main` directly. Every change reaches `main` through a reviewed PR.**
 
-1. Before starting any new feature or non-trivial change, run:
-   ```bash
-   git checkout main && git pull
-   git checkout -b feature/<short-kebab-name>
-   ```
-2. Commit your work on that branch.
-3. Open a PR with `gh pr create`. Use the PR template (`.github/PULL_REQUEST_TEMPLATE.md`).
-4. **Wait for the user to say "merge it" or "ready to merge"** before merging. Do not self-merge.
-5. After merging, delete the local branch and pull `main`.
+But — **branch by milestone, not by every tiny edit.** Avoid branch sprawl.
 
-Branch prefixes:
-- `feature/*` — new functionality
-- `fix/*` — bug fixes
-- `chore/*` — tooling, config, docs-only
-- `refactor/*` — internal restructuring without behavior change
+### When to open a new branch
+- A new milestone from the plan (e.g. `feature/lobby`, `feature/livekit-integration`).
+- A meaningful refactor or experimental spike.
+- A bug fix or dependency bump that needs its own review (`fix/*`, `chore/*`).
 
-Every PR must include a `docs/CHANGELOG.md` entry under the `Unreleased` section.
+### When NOT to open a new branch
+- Small tweaks to docs/config that belong to an already-open feature branch — just add a commit there.
+- Iterative commits within the same milestone — keep them on the existing feature branch and squash later if needed.
+
+### Flow
+```bash
+git checkout main && git pull
+git checkout -b feature/<short-kebab-name>
+# commit as many times as needed for the milestone
+gh pr create   # uses .github/PULL_REQUEST_TEMPLATE.md
+# wait for user to say "merge it" / "ready to merge" → then merge
+```
+
+### Rules
+- **Wait for explicit user approval before merging.** Never self-merge.
+- After merging, delete the local branch and `git pull` main.
+- Branch prefixes: `feature/*`, `fix/*`, `chore/*`, `refactor/*`.
+- Every PR must add a `docs/CHANGELOG.md` entry under `Unreleased`.
 
 ---
 
