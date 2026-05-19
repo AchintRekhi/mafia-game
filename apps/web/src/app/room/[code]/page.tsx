@@ -24,6 +24,9 @@ export default function RoomPage({ params }: Props) {
   const myRole = useGame((s) => s.myRole);
   const setRole = useGame((s) => s.setRole);
 
+  const addDetectiveResult = useGame((s) => s.addDetectiveResult);
+  const addDeath = useGame((s) => s.addDeath);
+
   const [waiting, setWaiting] = useState(!room);
   const [showReveal, setShowReveal] = useState(false);
 
@@ -41,6 +44,13 @@ export default function RoomPage({ params }: Props) {
       setTimeout(() => setShowReveal(false), REVEAL_MS);
     });
 
+    socket.on('detective:result', (r) => addDetectiveResult(r));
+    socket.on('player:died', (d) => addDeath(d));
+    socket.on('phase:start', () => {
+      // The authoritative state arrives via room:state right after; we just react to the
+      // transition signal here (could trigger SFX/animations later).
+    });
+
     socket.on('error:msg', (msg) => {
       console.error('[server error]', msg);
     });
@@ -53,6 +63,9 @@ export default function RoomPage({ params }: Props) {
         clearTimeout(t);
         socket.off('room:state');
         socket.off('role:assigned');
+        socket.off('detective:result');
+        socket.off('player:died');
+        socket.off('phase:start');
         socket.off('error:msg');
       };
     }
@@ -60,9 +73,12 @@ export default function RoomPage({ params }: Props) {
     return () => {
       socket.off('room:state');
       socket.off('role:assigned');
+      socket.off('detective:result');
+      socket.off('player:died');
+      socket.off('phase:start');
       socket.off('error:msg');
     };
-  }, [room, router, setRoom, setRole]);
+  }, [room, router, setRoom, setRole, addDetectiveResult, addDeath]);
 
   if (waiting || !room) {
     return (
@@ -74,7 +90,11 @@ export default function RoomPage({ params }: Props) {
 
   return (
     <>
-      {room.phase === 'lobby' ? <Lobby room={room} myId={myId} /> : <InGame room={room} myId={myId} />}
+      {room.phase === 'lobby' ? (
+        <Lobby room={room} myId={myId} />
+      ) : (
+        <InGame room={room} myId={myId} myRole={myRole} />
+      )}
       <AnimatePresence>{showReveal && myRole && <RoleReveal role={myRole} />}</AnimatePresence>
     </>
   );

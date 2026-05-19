@@ -26,5 +26,17 @@ All notable changes to this project will be documented here. Format follows [Kee
   - Client: `RoleReveal` component (Framer Motion card flip + role color glow) plays for 6s after assignment.
   - `InGame` view replaces Lobby once `phase !== 'lobby'`; player list shows a `RoleChip` beside each name with asymmetric visibility.
 
+- **Night phase + FSM kernel:**
+  - `game/fsm.ts`: timer-driven phase advancement (`role_assign → night_mafia → night_doctor → night_detective → day_recap`). One timer per room; cleared on transition.
+  - `game/resolver.ts`: night resolution (Mafia kill blocked by Doctor save) + `checkWinner()` (town wins when 0 Mafia; Mafia wins when Mafia ≥ Town).
+  - `handlers/night.ts`: socket events `mafia:pickTarget`, `doctor:protect`, `detective:investigate`. Validated by phase + role + alive. Mafia's pick is shared among Mafia for coordination; Doctor's pick is private; Detective gets a private `detective:result` at end of phase.
+  - Server-side LiveKit mute fires on death; `game:end` fires when a win condition triggers mid-night.
+- **Night UI:**
+  - `NightPhase`: per-role target picker (greyed for non-actors and the dead). Mafia sees the team's current pick; Doctor sees their own; Detective acts blind until results.
+  - `PhaseTimer`: 1Hz countdown from `room.phaseEndsAt`.
+  - `DayRecap`: dawn-breaks screen announcing the most-recent victim (or "no one died" if the Doctor saved them).
+  - Room page now persists detective results and death events in Zustand.
+
 ### Changed
 - `CLAUDE.md` trimmed to current project rules (branching default switched to direct-to-`main`).
+- `RoomView` now carries a per-viewer `night` slice (Mafia / Doctor only) so role-only UI doesn't have to wait for separate events.

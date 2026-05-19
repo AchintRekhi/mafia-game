@@ -1,22 +1,43 @@
 'use client';
 
-import type { RoomView } from '@mafia/shared';
+import type { Role, RoomView } from '@mafia/shared';
 import { VideoRoom } from './VideoRoom';
 import { RoleChip } from './RoleChip';
+import { PhaseTimer } from './PhaseTimer';
+import { NightPhase } from './NightPhase';
+import { DayRecap } from './DayRecap';
 
 interface Props {
   room: RoomView;
   myId: string | null;
+  myRole: Role | null;
 }
 
-export function InGame({ room, myId }: Props) {
+export function InGame({ room, myId, myRole }: Props) {
+  const isNight =
+    room.phase === 'night_mafia' ||
+    room.phase === 'night_doctor' ||
+    room.phase === 'night_detective';
+
+  if (isNight) {
+    return <NightPhase room={room} myId={myId} myRole={myRole} />;
+  }
+
+  if (room.phase === 'day_recap') {
+    return <DayRecap room={room} />;
+  }
+
+  // role_assign + (future) day_discussion / day_vote — generic in-game shell.
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-6">
       <header className="flex items-baseline justify-between">
         <p className="font-display text-2xl tracking-widest text-stone-100">{room.code}</p>
-        <p className="text-xs uppercase tracking-widest text-stone-400">
-          Phase · {room.phase.replace('_', ' ')}
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-xs uppercase tracking-widest text-stone-400">
+            {room.phase.replace('_', ' ')}
+          </p>
+          <PhaseTimer endsAt={room.phaseEndsAt} />
+        </div>
       </header>
 
       <VideoRoom />
@@ -30,7 +51,9 @@ export function InGame({ room, myId }: Props) {
             <li
               key={p.id}
               className={`flex items-center justify-between gap-2 rounded border px-3 py-2 ${
-                p.alive ? 'border-stone-800 bg-stone-950/60' : 'border-stone-900 bg-stone-950/40 opacity-50'
+                p.alive
+                  ? 'border-stone-800 bg-stone-950/60'
+                  : 'border-stone-900 bg-stone-950/40 opacity-50'
               } ${p.id === myId ? 'ring-1 ring-mafia' : ''}`}
             >
               <span className="truncate text-stone-100">
@@ -41,10 +64,6 @@ export function InGame({ room, myId }: Props) {
           ))}
         </ul>
       </section>
-
-      <p className="text-center text-xs text-stone-500">
-        Night phase lands next. For now, verify that role chips match expectations.
-      </p>
     </main>
   );
 }

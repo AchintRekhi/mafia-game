@@ -14,12 +14,24 @@ export interface PlayerView {
   isHost: boolean;
 }
 
+/**
+ * Per-viewer projection of the room's current night-action state.
+ * - Mafia sees the current collective pick (so multiple Mafia can coordinate).
+ * - Doctor sees their own protect pick.
+ * - Detective gets results via a separate `detective:result` event after the phase ends.
+ */
+export type NightSlice =
+  | { mafiaTarget: string | null }
+  | { doctorTarget: string | null }
+  | null;
+
 export interface RoomView {
   code: string;
   phase: Phase;
   phaseEndsAt: number | null;
   preset: TimingPreset;
   players: PlayerView[];
+  night: NightSlice;
 }
 
 export type JoinAck =

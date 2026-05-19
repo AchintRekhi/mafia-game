@@ -22,6 +22,12 @@ export function buildRoomView(room: Room, viewerSocketId: string): RoomView {
     phaseEndsAt: room.phaseEndsAt,
     preset: room.preset,
     players,
+    night:
+      viewer?.role === 'mafia'
+        ? { mafiaTarget: room.night.mafiaTarget }
+        : viewer?.role === 'doctor'
+          ? { doctorTarget: room.night.doctorTarget }
+          : null,
   };
 }
 

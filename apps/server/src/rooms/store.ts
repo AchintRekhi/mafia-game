@@ -9,6 +9,12 @@ export interface Player {
   role: Role | null;
 }
 
+export interface NightActions {
+  mafiaTarget: string | null;
+  doctorTarget: string | null;
+  detectiveTarget: string | null;
+}
+
 export interface Room {
   code: string;
   hostId: string;
@@ -17,6 +23,7 @@ export interface Room {
   preset: TimingPreset;
   phaseEndsAt: number | null;
   createdAt: number;
+  night: NightActions;
 }
 
 // In-memory store for v1. Swap for Redis when we go multi-instance.
@@ -53,6 +60,7 @@ export function createRoom(opts: { hostSocketId: string; hostName: string }): Ro
     preset: 'normal',
     phaseEndsAt: null,
     createdAt: Date.now(),
+    night: { mafiaTarget: null, doctorTarget: null, detectiveTarget: null },
   };
   rooms.set(code, room);
   socketToRoom.set(opts.hostSocketId, code);
@@ -111,6 +119,12 @@ export function setPhase(code: string, phase: Room['phase'], endsAt: number | nu
   room.phase = phase;
   room.phaseEndsAt = endsAt;
   return room;
+}
+
+export function resetNightActions(code: string) {
+  const room = rooms.get(code.toUpperCase());
+  if (!room) return;
+  room.night = { mafiaTarget: null, doctorTarget: null, detectiveTarget: null };
 }
 
 export function leaveRoom(socketId: string): { room: Room; wasHost: boolean } | null {

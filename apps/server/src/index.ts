@@ -5,6 +5,7 @@ import type { ClientToServerEvents, ServerToClientEvents } from '@mafia/shared';
 import { registerLobbyHandlers } from './handlers/lobby.js';
 import { registerLiveKitHandlers } from './handlers/livekit.js';
 import { registerHostHandlers } from './handlers/host.js';
+import { registerNightHandlers } from './handlers/night.js';
 import { isLiveKitConfigured } from './livekit/admin.js';
 
 const PORT = Number(process.env.PORT ?? 4000);
@@ -29,6 +30,7 @@ io.on('connection', (socket) => {
   registerLobbyHandlers(io, socket);
   registerLiveKitHandlers(io, socket);
   registerHostHandlers(io, socket);
+  registerNightHandlers(io, socket);
   socket.on('disconnect', (reason) => {
     console.log(`[socket] disconnected ${socket.id} (${reason})`);
   });
