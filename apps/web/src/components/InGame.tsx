@@ -6,6 +6,8 @@ import { RoleChip } from './RoleChip';
 import { PhaseTimer } from './PhaseTimer';
 import { NightPhase } from './NightPhase';
 import { DayRecap } from './DayRecap';
+import { DayDiscussion } from './DayDiscussion';
+import { DayVote } from './DayVote';
 
 interface Props {
   room: RoomView;
@@ -25,6 +27,14 @@ export function InGame({ room, myId, myRole }: Props) {
 
   if (room.phase === 'day_recap') {
     return <DayRecap room={room} />;
+  }
+
+  if (room.phase === 'day_discussion') {
+    return <DayDiscussion room={room} myId={myId} />;
+  }
+
+  if (room.phase === 'day_vote') {
+    return <DayVote room={room} myId={myId} />;
   }
 
   // role_assign + (future) day_discussion / day_vote — generic in-game shell.

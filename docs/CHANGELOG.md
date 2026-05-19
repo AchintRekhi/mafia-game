@@ -37,6 +37,15 @@ All notable changes to this project will be documented here. Format follows [Kee
   - `DayRecap`: dawn-breaks screen announcing the most-recent victim (or "no one died" if the Doctor saved them).
   - Room page now persists detective results and death events in Zustand.
 
+- **Day phase + chat:**
+  - FSM extended: `day_recap → day_discussion → day_vote → resolve → night_mafia` (game loops until a win).
+  - `resolveVote()`: plurality wins; ties = no lynch.
+  - `handlers/day.ts`: `day:vote` (can re-vote during the phase, including abstain); `chat:send` is public during day phases, scoped to living Mafia during `night_mafia`.
+  - `RoomView` now carries per-viewer `myVote` and a public `voteTally`.
+  - `DayDiscussion`: video + player list + chat panel.
+  - `DayVote`: target picker with live tally chips + abstain. Self-vote disabled.
+  - `ChatPanel` (reusable): muted for dead players (ghost chat lands in the next milestone).
+
 ### Changed
 - `CLAUDE.md` trimmed to current project rules (branching default switched to direct-to-`main`).
 - `RoomView` now carries a per-viewer `night` slice (Mafia / Doctor only) so role-only UI doesn't have to wait for separate events.

@@ -24,6 +24,8 @@ export interface Room {
   phaseEndsAt: number | null;
   createdAt: number;
   night: NightActions;
+  /** voterId → targetId (null = abstain). Cleared at end of day_vote. */
+  votes: Map<string, string | null>;
 }
 
 // In-memory store for v1. Swap for Redis when we go multi-instance.
@@ -61,6 +63,7 @@ export function createRoom(opts: { hostSocketId: string; hostName: string }): Ro
     phaseEndsAt: null,
     createdAt: Date.now(),
     night: { mafiaTarget: null, doctorTarget: null, detectiveTarget: null },
+    votes: new Map(),
   };
   rooms.set(code, room);
   socketToRoom.set(opts.hostSocketId, code);
@@ -125,6 +128,12 @@ export function resetNightActions(code: string) {
   const room = rooms.get(code.toUpperCase());
   if (!room) return;
   room.night = { mafiaTarget: null, doctorTarget: null, detectiveTarget: null };
+}
+
+export function resetVotes(code: string) {
+  const room = rooms.get(code.toUpperCase());
+  if (!room) return;
+  room.votes = new Map();
 }
 
 export function leaveRoom(socketId: string): { room: Room; wasHost: boolean } | null {

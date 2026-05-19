@@ -1,9 +1,9 @@
 import type { Server } from 'socket.io';
 import type { ClientToServerEvents, Phase, ServerToClientEvents } from '@mafia/shared';
 import { PRESET_TIMINGS } from '@mafia/shared';
-import { getRoomByCode, resetNightActions, setPhase } from '../rooms/store.js';
+import { getRoomByCode, resetNightActions, resetVotes, setPhase } from '../rooms/store.js';
 import { broadcastRoom } from '../handlers/lobby.js';
-import { resolveNight, checkWinner } from './resolver.js';
+import { resolveNight, resolveVote, checkWinner } from './resolver.js';
 import { silenceParticipant } from '../livekit/admin.js';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -16,7 +16,10 @@ const NEXT: Partial<Record<Phase, Phase>> = {
   night_mafia: 'night_doctor',
   night_doctor: 'night_detective',
   night_detective: 'day_recap',
-  // day_recap → day_discussion will land in the day-phase milestone.
+  day_recap: 'day_discussion',
+  day_discussion: 'day_vote',
+  day_vote: 'resolve',
+  resolve: 'night_mafia',
 };
 
 /** Start (or restart) the phase timer for a room. */
@@ -59,15 +62,16 @@ async function advance(io: IO, code: string) {
       await silenceParticipant(room.code, d.id);
       io.to(room.code).emit('player:died', d);
     }
-    const winner = checkWinner(room);
-    if (winner) {
-      const reveal: Record<string, NonNullable<typeof room.players[number]['role']>> = {};
-      for (const p of room.players) if (p.role) reveal[p.id] = p.role;
-      setPhase(code, 'end', null);
-      broadcastRoom(io, code);
-      io.to(code).emit('game:end', { winner, reveal });
-      return;
+    if (endIfWinner(io, code)) return;
+  }
+
+  if (room.phase === 'day_vote') {
+    const outcome = resolveVote(room);
+    if (outcome.lynched) {
+      await silenceParticipant(room.code, outcome.lynched);
+      io.to(room.code).emit('player:died', { id: outcome.lynched, cause: 'vote' });
     }
+    if (endIfWinner(io, code)) return;
   }
 
   const next = NEXT[room.phase];
@@ -76,6 +80,8 @@ async function advance(io: IO, code: string) {
   // onEnter
   if (next === 'night_mafia') {
     resetNightActions(code);
+  } else if (next === 'day_vote') {
+    resetVotes(code);
   }
 
   const ms = (PRESET_TIMINGS[room.preset][next] ?? 0) * 1000;
@@ -84,4 +90,18 @@ async function advance(io: IO, code: string) {
   io.to(code).emit('phase:start', { phase: next, endsAt: endsAt ?? 0 });
   broadcastRoom(io, code);
   scheduleAdvance(io, code);
+}
+
+function endIfWinner(io: IO, code: string): boolean {
+  const room = getRoomByCode(code);
+  if (!room) return false;
+  const winner = checkWinner(room);
+  if (!winner) return false;
+  const reveal: Record<string, NonNullable<(typeof room.players)[number]['role']>> = {};
+  for (const p of room.players) if (p.role) reveal[p.id] = p.role;
+  setPhase(code, 'end', null);
+  broadcastRoom(io, code);
+  io.to(code).emit('game:end', { winner, reveal });
+  clearTimer(code);
+  return true;
 }

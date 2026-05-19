@@ -41,3 +41,36 @@ export function checkWinner(room: Room): 'town' | 'mafia' | null {
   if (mafia >= town) return 'mafia';
   return null;
 }
+
+export interface VoteOutcome {
+  tally: Record<string, number>;
+  lynched: string | null; // null = tie or all abstain
+}
+
+export function resolveVote(room: Room): VoteOutcome {
+  const tally: Record<string, number> = {};
+  for (const [, target] of room.votes) {
+    if (!target) continue;
+    tally[target] = (tally[target] ?? 0) + 1;
+  }
+  let lynched: string | null = null;
+  let max = 0;
+  let tied = false;
+  for (const [id, count] of Object.entries(tally)) {
+    if (count > max) {
+      max = count;
+      lynched = id;
+      tied = false;
+    } else if (count === max) {
+      tied = true;
+    }
+  }
+  if (tied) lynched = null;
+
+  if (lynched) {
+    const p = room.players.find((x) => x.id === lynched);
+    if (p && p.alive) p.alive = false;
+    else lynched = null;
+  }
+  return { tally, lynched };
+}

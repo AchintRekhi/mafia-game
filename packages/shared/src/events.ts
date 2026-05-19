@@ -32,6 +32,10 @@ export interface RoomView {
   preset: TimingPreset;
   players: PlayerView[];
   night: NightSlice;
+  /** Per-viewer: the id this socket has voted for in day_vote (null if not voted / abstain). */
+  myVote?: string | null;
+  /** Public running tally during day_vote (targetId → count). */
+  voteTally?: Record<string, number>;
 }
 
 export type JoinAck =
@@ -75,6 +79,7 @@ export interface ServerToClientEvents {
 
   'chat:message': (msg: { from: string; text: string; at: number }) => void;
   'ghost:message': (msg: { from: string; text: string; at: number }) => void;
+  'vote:tally': (tally: Record<string, number>) => void;
 
   'error:msg': (msg: string) => void;
 }

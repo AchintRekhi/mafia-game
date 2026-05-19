@@ -16,6 +16,11 @@ export function buildRoomView(room: Room, viewerSocketId: string): RoomView {
     isHost: p.isHost,
     role: computeVisibleRole(p, viewer),
   }));
+  const voteTally: Record<string, number> = {};
+  for (const [, t] of room.votes) {
+    if (t) voteTally[t] = (voteTally[t] ?? 0) + 1;
+  }
+
   return {
     code: room.code,
     phase: room.phase,
@@ -28,6 +33,8 @@ export function buildRoomView(room: Room, viewerSocketId: string): RoomView {
         : viewer?.role === 'doctor'
           ? { doctorTarget: room.night.doctorTarget }
           : null,
+    myVote: viewer ? (room.votes.get(viewer.id) ?? null) : null,
+    voteTally,
   };
 }
 
