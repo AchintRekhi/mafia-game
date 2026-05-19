@@ -1,3 +1,3 @@
-export * from './roles.js';
-export * from './phases.js';
-export * from './events.js';
+export * from './roles';
+export * from './phases';
+export * from './events';

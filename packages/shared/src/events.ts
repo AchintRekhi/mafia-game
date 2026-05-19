@@ -1,5 +1,5 @@
-import type { Role } from './roles.js';
-import type { Phase, TimingPreset } from './phases.js';
+import type { Role } from './roles';
+import type { Phase, TimingPreset } from './phases';
 
 /**
  * The personalized view of another player from the perspective of a given socket.
