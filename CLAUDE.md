@@ -4,35 +4,32 @@ This file is the source of truth for how Claude Code should behave in this repo.
 
 ---
 
-## 🔒 Branching Rule (MUST FOLLOW)
+## 🔒 Branching & Commit Rule
 
-**Never commit to `main` directly. Every change reaches `main` through a reviewed PR.**
+**Default: commit directly to `main`.** No PR is required for normal work.
 
-But — **branch by milestone, not by every tiny edit.** Avoid branch sprawl.
+**Only create a branch when the user explicitly asks for one** — e.g. "put this on a branch", "make a feature branch for X". That's the signal for experimental, risky, or reviewable work the user wants gated.
 
-### When to open a new branch
-- A new milestone from the plan (e.g. `feature/lobby`, `feature/livekit-integration`).
-- A meaningful refactor or experimental spike.
-- A bug fix or dependency bump that needs its own review (`fix/*`, `chore/*`).
-
-### When NOT to open a new branch
-- Small tweaks to docs/config that belong to an already-open feature branch — just add a commit there.
-- Iterative commits within the same milestone — keep them on the existing feature branch and squash later if needed.
-
-### Flow
+### Default flow
 ```bash
-git checkout main && git pull
-git checkout -b feature/<short-kebab-name>
-# commit as many times as needed for the milestone
-gh pr create   # uses .github/PULL_REQUEST_TEMPLATE.md
-# wait for user to say "merge it" / "ready to merge" → then merge
+# edit, then:
+git add -A
+git commit -m "feat(scope): short summary"  # Conventional Commits still in force
 ```
 
-### Rules
-- **Wait for explicit user approval before merging.** Never self-merge.
-- After merging, delete the local branch and `git pull` main.
-- Branch prefixes: `feature/*`, `fix/*`, `chore/*`, `refactor/*`.
-- Every PR must add a `docs/CHANGELOG.md` entry under `Unreleased`.
+### When the user asks for a branch
+```bash
+git checkout main && git pull
+git checkout -b feature/<short-name>
+# work, commit
+# wait for "merge it" before merging
+git checkout main && git merge --no-ff feature/<short-name> && git branch -d feature/<short-name>
+```
+
+### Always
+- Keep commits small and well-described — they're individually revertable.
+- Update `docs/CHANGELOG.md` under `Unreleased` in the same commit as the change.
+- **Never push to `origin` without explicit instruction.** The user handles pushes.
 
 ---
 
