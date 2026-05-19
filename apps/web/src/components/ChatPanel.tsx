@@ -4,8 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { getSocket } from '@/lib/socket';
 import { useGame } from '@/lib/store';
 
-export function ChatPanel({ disabled, placeholder }: { disabled?: boolean; placeholder?: string }) {
-  const messages = useGame((s) => s.chat);
+interface Props {
+  /** Channel to render. 'public' = living-player chat, 'ghost' = dead-only chat. */
+  channel?: 'public' | 'ghost';
+  placeholder?: string;
+}
+
+export function ChatPanel({ channel = 'public', placeholder }: Props) {
+  const messages = useGame((s) => (channel === 'ghost' ? s.ghostChat : s.chat));
   const [text, setText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -20,15 +26,25 @@ export function ChatPanel({ disabled, placeholder }: { disabled?: boolean; place
     setText('');
   };
 
+  const accent = channel === 'ghost' ? 'border-stone-700' : 'border-stone-800';
+  const inputAccent = channel === 'ghost' ? 'focus:border-stone-400' : 'focus:border-mafia';
+  const buttonClass =
+    channel === 'ghost' ? 'bg-stone-700 text-stone-100' : 'bg-mafia text-stone-50';
+
   return (
-    <div className="flex h-[40vh] flex-col rounded border border-stone-800 bg-stone-950/60">
+    <div className={`flex h-[40vh] flex-col rounded border bg-stone-950/60 ${accent}`}>
+      {channel === 'ghost' && (
+        <div className="border-b border-stone-800 px-3 py-1.5 text-[10px] uppercase tracking-widest text-stone-500">
+          Ghost chat · only the dead can read this
+        </div>
+      )}
       <div ref={scrollRef} className="flex-1 space-y-1 overflow-y-auto p-3 text-sm">
         {messages.length === 0 ? (
           <p className="text-stone-500">No messages yet.</p>
         ) : (
           messages.map((m, i) => (
-            <p key={i} className="text-stone-200">
-              <span className="font-display tracking-wider text-stone-400">{m.from}:</span>{' '}
+            <p key={i} className={channel === 'ghost' ? 'text-stone-400' : 'text-stone-200'}>
+              <span className="font-display tracking-wider text-stone-500">{m.from}:</span>{' '}
               {m.text}
             </p>
           ))
@@ -42,14 +58,13 @@ export function ChatPanel({ disabled, placeholder }: { disabled?: boolean; place
             if (e.key === 'Enter') send();
           }}
           maxLength={280}
-          disabled={disabled}
-          placeholder={disabled ? 'Chat disabled this phase' : (placeholder ?? 'Say something…')}
-          className="flex-1 rounded border border-stone-700 bg-stone-900 px-3 py-1.5 text-stone-100 outline-none focus:border-mafia disabled:opacity-50"
+          placeholder={placeholder ?? 'Say something…'}
+          className={`flex-1 rounded border border-stone-700 bg-stone-900 px-3 py-1.5 text-stone-100 outline-none ${inputAccent}`}
         />
         <button
           onClick={send}
-          disabled={disabled || !text.trim()}
-          className="rounded bg-mafia px-4 py-1.5 font-display tracking-wider text-stone-50 disabled:opacity-40"
+          disabled={!text.trim()}
+          className={`rounded px-4 py-1.5 font-display tracking-wider disabled:opacity-40 ${buttonClass}`}
         >
           Send
         </button>

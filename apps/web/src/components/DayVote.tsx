@@ -81,8 +81,8 @@ export function DayVote({ room, myId }: Props) {
 
         <section>
           <ChatPanel
-            disabled={!me?.alive}
-            placeholder={me?.alive ? 'Final words…' : 'Spectating'}
+            channel={me?.alive ? 'public' : 'ghost'}
+            placeholder={me?.alive ? 'Final words…' : 'Whisper to the dead…'}
           />
         </section>
       </div>

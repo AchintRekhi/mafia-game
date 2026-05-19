@@ -33,6 +33,7 @@ interface GameState {
   detectiveResults: DetectiveResult[];
   recentDeaths: DeathEvent[];
   chat: ChatMessage[];
+  ghostChat: ChatMessage[];
   ending: EndPayload | null;
   setMe: (id: string) => void;
   setRoom: (room: RoomView) => void;
@@ -40,6 +41,7 @@ interface GameState {
   addDetectiveResult: (r: Omit<DetectiveResult, 'at'>) => void;
   addDeath: (d: Omit<DeathEvent, 'at'>) => void;
   addChat: (msg: ChatMessage) => void;
+  addGhostChat: (msg: ChatMessage) => void;
   setEnding: (e: EndPayload) => void;
   clearGame: () => void;
   reset: () => void;
@@ -52,6 +54,7 @@ export const useGame = create<GameState>((set) => ({
   detectiveResults: [],
   recentDeaths: [],
   chat: [],
+  ghostChat: [] as ChatMessage[],
   ending: null,
   setMe: (id) => set({ myId: id }),
   setRoom: (room) => set({ room }),
@@ -60,6 +63,8 @@ export const useGame = create<GameState>((set) => ({
     set((s) => ({ detectiveResults: [...s.detectiveResults, { ...r, at: Date.now() }] })),
   addDeath: (d) => set((s) => ({ recentDeaths: [...s.recentDeaths, { ...d, at: Date.now() }] })),
   addChat: (msg) => set((s) => ({ chat: [...s.chat, msg].slice(-200) })),
+  addGhostChat: (msg: ChatMessage) =>
+    set((s) => ({ ghostChat: [...s.ghostChat, msg].slice(-200) })),
   setEnding: (e) => set({ ending: e }),
   clearGame: () =>
     set({
@@ -67,6 +72,7 @@ export const useGame = create<GameState>((set) => ({
       detectiveResults: [],
       recentDeaths: [],
       chat: [],
+      ghostChat: [],
       ending: null,
     }),
   reset: () =>
@@ -77,6 +83,7 @@ export const useGame = create<GameState>((set) => ({
       detectiveResults: [],
       recentDeaths: [],
       chat: [],
+      ghostChat: [],
       ending: null,
     }),
 }));

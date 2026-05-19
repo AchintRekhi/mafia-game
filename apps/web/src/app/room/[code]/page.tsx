@@ -27,6 +27,7 @@ export default function RoomPage({ params }: Props) {
   const addDetectiveResult = useGame((s) => s.addDetectiveResult);
   const addDeath = useGame((s) => s.addDeath);
   const addChat = useGame((s) => s.addChat);
+  const addGhostChat = useGame((s) => s.addGhostChat);
   const setEnding = useGame((s) => s.setEnding);
   const clearGame = useGame((s) => s.clearGame);
 
@@ -50,6 +51,7 @@ export default function RoomPage({ params }: Props) {
     socket.on('detective:result', (r) => addDetectiveResult(r));
     socket.on('player:died', (d) => addDeath(d));
     socket.on('chat:message', (m) => addChat(m));
+    socket.on('ghost:message', (m) => addGhostChat(m));
     socket.on('game:end', (payload) => setEnding(payload));
     socket.on('game:reset', () => clearGame());
     socket.on('phase:start', () => {
@@ -72,6 +74,7 @@ export default function RoomPage({ params }: Props) {
         socket.off('detective:result');
         socket.off('player:died');
         socket.off('chat:message');
+        socket.off('ghost:message');
         socket.off('game:end');
         socket.off('game:reset');
         socket.off('phase:start');
@@ -87,7 +90,18 @@ export default function RoomPage({ params }: Props) {
       socket.off('phase:start');
       socket.off('error:msg');
     };
-  }, [room, router, setRoom, setRole, addDetectiveResult, addDeath, addChat, setEnding, clearGame]);
+  }, [
+    room,
+    router,
+    setRoom,
+    setRole,
+    addDetectiveResult,
+    addDeath,
+    addChat,
+    addGhostChat,
+    setEnding,
+    clearGame,
+  ]);
 
   if (waiting || !room) {
     return (

@@ -39,15 +39,28 @@ export function registerDayHandlers(io: IO, socket: S) {
     const me = room.players.find((p) => p.id === socket.id);
     if (!me) return;
 
-    // Public chat allowed during day_discussion + day_vote for living players.
+    // Dead players always go to ghost chat (visible only to other dead).
+    if (!me.alive) {
+      const ghosts = room.players.filter((p) => !p.alive);
+      for (const g of ghosts) {
+        io.to(g.id).emit('ghost:message', {
+          from: `✝ ${me.name}`,
+          text,
+          at: Date.now(),
+        });
+      }
+      return;
+    }
+
+    // Public chat during day_discussion + day_vote for living players.
     const isDay = room.phase === 'day_discussion' || room.phase === 'day_vote';
-    if (isDay && me.alive) {
+    if (isDay) {
       io.to(room.code).emit('chat:message', { from: me.name, text, at: Date.now() });
       return;
     }
 
-    // Mafia private chat during night_mafia for living Mafia.
-    if (room.phase === 'night_mafia' && me.alive && me.role === 'mafia') {
+    // Mafia private chat during night_mafia.
+    if (room.phase === 'night_mafia' && me.role === 'mafia') {
       const targets = room.players.filter((p) => p.role === 'mafia' && p.alive);
       for (const t of targets) {
         io.to(t.id).emit('chat:message', {
@@ -58,7 +71,20 @@ export function registerDayHandlers(io: IO, socket: S) {
       }
       return;
     }
-    // Otherwise drop silently (dead-player ghost chat lands in death-handling milestone).
+    // Otherwise drop silently.
+  });
+
+  socket.on('host:setPreset', (preset) => {
+    const room = getRoomBySocket(socket.id);
+    if (!room) return;
+    if (room.hostId !== socket.id) return;
+    if (room.phase !== 'lobby') return;
+    if (preset !== 'fast' && preset !== 'normal' && preset !== 'long') return;
+    room.preset = preset;
+    // Re-broadcast personalized state.
+    for (const p of room.players) {
+      io.to(p.id).emit('room:state', buildRoomView(room, p.id));
+    }
   });
 }
 

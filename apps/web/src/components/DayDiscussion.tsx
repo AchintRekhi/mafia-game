@@ -49,8 +49,8 @@ export function DayDiscussion({ room, myId }: Props) {
 
         <section>
           <ChatPanel
-            disabled={!me?.alive}
-            placeholder={me?.alive ? 'Make your case…' : 'Spectating'}
+            channel={me?.alive ? 'public' : 'ghost'}
+            placeholder={me?.alive ? 'Make your case…' : 'Whisper to the dead…'}
           />
         </section>
       </div>

@@ -49,6 +49,8 @@ All notable changes to this project will be documented here. Format follows [Kee
   - `game:end` event reveals every player's true role.
   - `GameEnd`: full-screen winner banner (red for Mafia, green for Town) + reveal grid.
   - Host-only "Play again" → `host:rematch` resets the room to lobby; `unsilenceParticipant()` restores LiveKit publishing for previously-killed players. `game:reset` clears all client-side game state.
+- **Ghost chat (dead players):** `chat:send` is server-routed — dead players' messages go out as `ghost:message` only to other dead players. `ChatPanel` accepts a `channel` prop and styles the ghost variant distinctly with a "only the dead can read this" header.
+- **Host-configurable timing presets:** `host:setPreset` event accepts `fast` / `normal` / `long`; only the host, only in lobby phase. `PresetPicker` in the Lobby shows the three options with a one-line description of each.
 
 ### Changed
 - `CLAUDE.md` trimmed to current project rules (branching default switched to direct-to-`main`).
