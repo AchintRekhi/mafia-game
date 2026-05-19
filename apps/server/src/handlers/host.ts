@@ -1,10 +1,11 @@
 import type { Server, Socket } from 'socket.io';
 import type { ClientToServerEvents, ServerToClientEvents } from '@mafia/shared';
 import { PRESET_TIMINGS } from '@mafia/shared';
-import { getRoomBySocket, setPhase, startGame } from '../rooms/store.js';
+import { getRoomBySocket, resetForRematch, setPhase, startGame } from '../rooms/store.js';
 import { assignRoles } from '../game/roles.js';
 import { broadcastRoom } from './lobby.js';
-import { scheduleAdvance } from '../game/fsm.js';
+import { clearTimer, scheduleAdvance } from '../game/fsm.js';
+import { unsilenceParticipant } from '../livekit/admin.js';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 type S = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -37,5 +38,24 @@ export function registerHostHandlers(io: IO, socket: S) {
 
     // Kick off the FSM — after the reveal window the server auto-advances to night.
     scheduleAdvance(io, guard.room.code);
+  });
+
+  socket.on('host:rematch', async () => {
+    const room = getRoomBySocket(socket.id);
+    if (!room) return;
+    if (room.hostId !== socket.id) {
+      socket.emit('error:msg', 'Only the host can rematch');
+      return;
+    }
+    if (room.phase !== 'end') {
+      socket.emit('error:msg', 'Game still in progress');
+      return;
+    }
+    clearTimer(room.code);
+    // Restore publishing for anyone who was silenced.
+    await Promise.all(room.players.map((p) => unsilenceParticipant(room.code, p.id)));
+    resetForRematch(room.code);
+    io.to(room.code).emit('game:reset');
+    broadcastRoom(io, room.code);
   });
 }

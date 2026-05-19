@@ -48,6 +48,7 @@ export interface ClientToServerEvents {
   'room:join': (payload: { code: string; name: string }, ack: (res: JoinAck) => void) => void;
   'room:leave': () => void;
   'host:start': () => void;
+  'host:rematch': () => void;
   'host:setPreset': (preset: TimingPreset) => void;
 
   'livekit:requestToken': (
@@ -80,6 +81,7 @@ export interface ServerToClientEvents {
   'chat:message': (msg: { from: string; text: string; at: number }) => void;
   'ghost:message': (msg: { from: string; text: string; at: number }) => void;
   'vote:tally': (tally: Record<string, number>) => void;
+  'game:reset': () => void;
 
   'error:msg': (msg: string) => void;
 }

@@ -27,6 +27,8 @@ export default function RoomPage({ params }: Props) {
   const addDetectiveResult = useGame((s) => s.addDetectiveResult);
   const addDeath = useGame((s) => s.addDeath);
   const addChat = useGame((s) => s.addChat);
+  const setEnding = useGame((s) => s.setEnding);
+  const clearGame = useGame((s) => s.clearGame);
 
   const [waiting, setWaiting] = useState(!room);
   const [showReveal, setShowReveal] = useState(false);
@@ -48,6 +50,8 @@ export default function RoomPage({ params }: Props) {
     socket.on('detective:result', (r) => addDetectiveResult(r));
     socket.on('player:died', (d) => addDeath(d));
     socket.on('chat:message', (m) => addChat(m));
+    socket.on('game:end', (payload) => setEnding(payload));
+    socket.on('game:reset', () => clearGame());
     socket.on('phase:start', () => {
       // The authoritative state arrives via room:state right after; we just react to the
       // transition signal here (could trigger SFX/animations later).
@@ -68,6 +72,8 @@ export default function RoomPage({ params }: Props) {
         socket.off('detective:result');
         socket.off('player:died');
         socket.off('chat:message');
+        socket.off('game:end');
+        socket.off('game:reset');
         socket.off('phase:start');
         socket.off('error:msg');
       };
@@ -81,7 +87,7 @@ export default function RoomPage({ params }: Props) {
       socket.off('phase:start');
       socket.off('error:msg');
     };
-  }, [room, router, setRoom, setRole, addDetectiveResult, addDeath, addChat]);
+  }, [room, router, setRoom, setRole, addDetectiveResult, addDeath, addChat, setEnding, clearGame]);
 
   if (waiting || !room) {
     return (

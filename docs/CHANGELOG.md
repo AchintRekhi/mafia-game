@@ -45,6 +45,10 @@ All notable changes to this project will be documented here. Format follows [Kee
   - `DayDiscussion`: video + player list + chat panel.
   - `DayVote`: target picker with live tally chips + abstain. Self-vote disabled.
   - `ChatPanel` (reusable): muted for dead players (ghost chat lands in the next milestone).
+- **End game + rematch:**
+  - `game:end` event reveals every player's true role.
+  - `GameEnd`: full-screen winner banner (red for Mafia, green for Town) + reveal grid.
+  - Host-only "Play again" → `host:rematch` resets the room to lobby; `unsilenceParticipant()` restores LiveKit publishing for previously-killed players. `game:reset` clears all client-side game state.
 
 ### Changed
 - `CLAUDE.md` trimmed to current project rules (branching default switched to direct-to-`main`).

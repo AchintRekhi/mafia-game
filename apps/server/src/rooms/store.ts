@@ -136,6 +136,20 @@ export function resetVotes(code: string) {
   room.votes = new Map();
 }
 
+export function resetForRematch(code: string): Room | null {
+  const room = rooms.get(code.toUpperCase());
+  if (!room) return null;
+  for (const p of room.players) {
+    p.alive = true;
+    p.role = null;
+  }
+  room.phase = 'lobby';
+  room.phaseEndsAt = null;
+  room.night = { mafiaTarget: null, doctorTarget: null, detectiveTarget: null };
+  room.votes = new Map();
+  return room;
+}
+
 export function leaveRoom(socketId: string): { room: Room; wasHost: boolean } | null {
   const code = socketToRoom.get(socketId);
   if (!code) return null;

@@ -68,3 +68,16 @@ export async function silenceParticipant(roomCode: string, identity: string) {
     console.error('[livekit] silenceParticipant failed', { roomCode, identity, err });
   }
 }
+
+/** Inverse of silenceParticipant — used at rematch to restore publishing. */
+export async function unsilenceParticipant(roomCode: string, identity: string) {
+  if (!isLiveKitConfigured()) return;
+  try {
+    const participant = await svc().getParticipant(roomCode, identity);
+    for (const track of participant.tracks ?? []) {
+      await svc().mutePublishedTrack(roomCode, identity, track.sid, false);
+    }
+  } catch (err) {
+    console.error('[livekit] unsilenceParticipant failed', { roomCode, identity, err });
+  }
+}

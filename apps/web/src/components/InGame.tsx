@@ -8,6 +8,7 @@ import { NightPhase } from './NightPhase';
 import { DayRecap } from './DayRecap';
 import { DayDiscussion } from './DayDiscussion';
 import { DayVote } from './DayVote';
+import { GameEnd } from './GameEnd';
 
 interface Props {
   room: RoomView;
@@ -35,6 +36,10 @@ export function InGame({ room, myId, myRole }: Props) {
 
   if (room.phase === 'day_vote') {
     return <DayVote room={room} myId={myId} />;
+  }
+
+  if (room.phase === 'end') {
+    return <GameEnd room={room} myId={myId} />;
   }
 
   // role_assign + (future) day_discussion / day_vote — generic in-game shell.
