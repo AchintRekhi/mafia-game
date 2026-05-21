@@ -39,6 +39,10 @@ export interface RoomView {
 }
 
 export type JoinAck =
+  | { ok: true; you: { id: string; sessionId: string }; code: string }
+  | { ok: false; error: string };
+
+export type ResumeAck =
   | { ok: true; you: { id: string }; code: string }
   | { ok: false; error: string };
 
@@ -46,6 +50,10 @@ export type JoinAck =
 export interface ClientToServerEvents {
   'room:create': (payload: { name: string }, ack: (res: JoinAck) => void) => void;
   'room:join': (payload: { code: string; name: string }, ack: (res: JoinAck) => void) => void;
+  'room:resume': (
+    payload: { code: string; sessionId: string },
+    ack: (res: ResumeAck) => void,
+  ) => void;
   'room:leave': () => void;
   'host:start': () => void;
   'host:rematch': () => void;

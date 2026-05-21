@@ -7,12 +7,14 @@ import { useGame } from '@/lib/store';
 import { Lobby } from '@/components/Lobby';
 import { InGame } from '@/components/InGame';
 import { RoleReveal } from '@/components/RoleReveal';
+import { clearStoredSession, getSocket, getStoredSession } from '@/lib/socket';
 
 interface Props {
   params: Promise<{ code: string }>;
 }
 
 const REVEAL_MS = 6_000;
+const RESUME_TIMEOUT_MS = 4_000;
 
 export default function RoomPage({ params }: Props) {
   const { code } = use(params);
@@ -20,18 +22,53 @@ export default function RoomPage({ params }: Props) {
   const room = useGame((s) => s.room);
   const myId = useGame((s) => s.myId);
   const myRole = useGame((s) => s.myRole);
+  const setMe = useGame((s) => s.setMe);
 
   const [showReveal, setShowReveal] = useState(false);
 
-  // If we landed here without state (e.g. hard refresh), bounce home.
-  // Reconnect tokens are a later milestone.
+  // If we have no room state yet, try to resume via stored sessionId. If the
+  // server doesn't recognize the session (room expired, evicted past grace),
+  // bounce home. Otherwise wait for room:state to arrive.
   useEffect(() => {
     if (room) return;
+    const sessionId = getStoredSession(code);
+    if (!sessionId) {
+      router.replace('/');
+      return;
+    }
+
+    let timedOut = false;
+    const socket = getSocket();
+    const attempt = () => {
+      socket.emit('room:resume', { code, sessionId }, (res) => {
+        if (timedOut) return;
+        if (!res.ok) {
+          clearStoredSession(code);
+          router.replace('/');
+          return;
+        }
+        setMe(res.you.id);
+      });
+    };
+
+    if (socket.connected) {
+      attempt();
+    } else {
+      socket.once('connect', attempt);
+    }
+
     const t = setTimeout(() => {
-      if (!useGame.getState().room) router.replace('/');
-    }, 800);
-    return () => clearTimeout(t);
-  }, [room, router]);
+      timedOut = true;
+      if (!useGame.getState().room) {
+        router.replace('/');
+      }
+    }, RESUME_TIMEOUT_MS);
+
+    return () => {
+      clearTimeout(t);
+      socket.off('connect', attempt);
+    };
+  }, [room, code, router, setMe]);
 
   // Trigger role reveal animation whenever myRole goes from null → set.
   useEffect(() => {

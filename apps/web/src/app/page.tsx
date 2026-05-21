@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSocket } from '@/lib/socket';
+import { getSocket, setStoredSession } from '@/lib/socket';
 import { useGame } from '@/lib/store';
 
 export default function Home() {
@@ -27,6 +27,7 @@ export default function Home() {
       setBusy(false);
       if (!res.ok) return setError(res.error);
       setMe(res.you.id);
+      setStoredSession(res.code, res.you.sessionId);
       router.push(`/room/${res.code}`);
     });
   };
@@ -43,6 +44,7 @@ export default function Home() {
         setBusy(false);
         if (!res.ok) return setError(res.error);
         setMe(res.you.id);
+        setStoredSession(res.code, res.you.sessionId);
         router.push(`/room/${res.code}`);
       },
     );
