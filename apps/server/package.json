@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "echo 'no build step — server runs via tsx in prod'",
+    "start": "tsx src/index.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
@@ -16,11 +16,11 @@
     "dotenv": "^16.4.0",
     "ioredis": "^5.4.0",
     "livekit-server-sdk": "^2.7.0",
-    "socket.io": "^4.7.0"
+    "socket.io": "^4.7.0",
+    "tsx": "^4.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
-    "tsx": "^4.16.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   }
