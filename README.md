@@ -49,10 +49,10 @@ pnpm format       # prettier
 
 ## Deployment
 
-The two apps deploy separately:
+The two apps deploy separately. Config files at the repo root (`vercel.json`, `railway.json`) pin the build/install/start commands so the platform UIs need almost no manual setup.
 
-- **`apps/web` → Vercel.** Set Root Directory to `apps/web`. Add `NEXT_PUBLIC_SERVER_URL` pointing at your deployed server.
-- **`apps/server` → Railway** (or Fly.io / Render). Needs persistent WebSocket connections — won't run on Vercel. Set `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `WEB_ORIGIN` (your Vercel URL) as env vars. The server runs via `tsx` in production; no build step is needed.
+- **`apps/web` → Vercel.** Import the repo with **Root Directory = repo root** (let `vercel.json` route the build into `apps/web`). Add env var `NEXT_PUBLIC_SERVER_URL` pointing at your deployed server URL.
+- **`apps/server` → Railway** (or Fly.io / Render). Needs persistent WebSocket connections — won't run on Vercel. Import the repo; `railway.json` pins the build + start. Set env vars `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `WEB_ORIGIN` (your Vercel URL). The server runs via `tsx` in production; no compile step.
 
 Also add your Vercel domains to the allowed origins in your LiveKit Cloud project.
 
