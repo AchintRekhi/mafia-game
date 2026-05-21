@@ -4,7 +4,7 @@ import { PRESET_TIMINGS } from '@mafia/shared';
 import { getRoomByCode, resetNightActions, resetVotes, setPhase } from '../rooms/store.js';
 import { broadcastRoom } from '../handlers/lobby.js';
 import { resolveNight, resolveVote, checkWinner } from './resolver.js';
-import { silenceParticipant } from '../livekit/admin.js';
+import { silenceParticipant, unsilenceParticipant } from '../livekit/admin.js';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 
@@ -62,7 +62,7 @@ async function advance(io: IO, code: string) {
       await silenceParticipant(room.code, d.id);
       io.to(room.code).emit('player:died', d);
     }
-    if (endIfWinner(io, code)) return;
+    if (await endIfWinner(io, code)) return;
   }
 
   if (room.phase === 'day_vote') {
@@ -71,7 +71,7 @@ async function advance(io: IO, code: string) {
       await silenceParticipant(room.code, outcome.lynched);
       io.to(room.code).emit('player:died', { id: outcome.lynched, cause: 'vote' });
     }
-    if (endIfWinner(io, code)) return;
+    if (await endIfWinner(io, code)) return;
   }
 
   const next = NEXT[room.phase];
@@ -92,7 +92,7 @@ async function advance(io: IO, code: string) {
   scheduleAdvance(io, code);
 }
 
-function endIfWinner(io: IO, code: string): boolean {
+async function endIfWinner(io: IO, code: string): Promise<boolean> {
   const room = getRoomByCode(code);
   if (!room) return false;
   const winner = checkWinner(room);
@@ -100,6 +100,9 @@ function endIfWinner(io: IO, code: string): boolean {
   const reveal: Record<string, NonNullable<(typeof room.players)[number]['role']>> = {};
   for (const p of room.players) if (p.role) reveal[p.id] = p.role;
   setPhase(code, 'end', null);
+  // Restore mic + camera for everyone who was silenced during the game so the
+  // table can see and hear each other's reactions during the reveal.
+  await Promise.all(room.players.map((p) => unsilenceParticipant(room.code, p.id)));
   broadcastRoom(io, code);
   io.to(code).emit('game:end', { winner, reveal });
   clearTimer(code);

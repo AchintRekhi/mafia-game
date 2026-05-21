@@ -6,6 +6,7 @@ import { ROLE_COLOR } from '@mafia/shared';
 import { useGame } from '@/lib/store';
 import { getSocket } from '@/lib/socket';
 import { RoleChip } from './RoleChip';
+import { VideoRoom } from './VideoRoom';
 
 interface Props {
   room: RoomView;
@@ -39,6 +40,10 @@ export function GameEnd({ room, myId }: Props) {
       >
         {winnerLabel} WINS
       </motion.h1>
+
+      <section className="w-full">
+        <VideoRoom />
+      </section>
 
       <section className="w-full">
         <h2 className="mb-3 text-center font-display text-lg tracking-wider text-stone-100">
