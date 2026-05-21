@@ -50,6 +50,16 @@ async function advance(io: IO, code: string) {
   if (!room) return;
 
   // onExit hooks for the phase we're leaving.
+  if (room.phase === 'night_mafia') {
+    // Leaving the Mafia-only audio window — restore mic/camera for living
+    // non-Mafia players that we silenced on enter. Dead players stay silenced.
+    await Promise.all(
+      room.players
+        .filter((p) => p.alive && p.role !== 'mafia')
+        .map((p) => unsilenceParticipant(room.code, p.id)),
+    );
+  }
+
   if (room.phase === 'night_detective') {
     const outcome = resolveNight(room);
     if (outcome.detective) {
@@ -80,6 +90,13 @@ async function advance(io: IO, code: string) {
   // onEnter
   if (next === 'night_mafia') {
     resetNightActions(code);
+    // Cheat-proof Mafia coordination: server-mute every non-Mafia living
+    // player so only Mafia can talk during this window. Restored on exit.
+    await Promise.all(
+      room.players
+        .filter((p) => p.alive && p.role !== 'mafia')
+        .map((p) => silenceParticipant(room.code, p.id)),
+    );
   } else if (next === 'day_vote') {
     resetVotes(code);
   }
