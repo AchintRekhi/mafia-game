@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import type { Role, RoomView } from '@mafia/shared';
 import { VideoRoom } from './VideoRoom';
 import { RoleChip } from './RoleChip';
@@ -16,33 +17,59 @@ interface Props {
   myRole: Role | null;
 }
 
+const fade = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.35 },
+};
+
 export function InGame({ room, myId, myRole }: Props) {
   const isNight =
     room.phase === 'night_mafia' ||
     room.phase === 'night_doctor' ||
     room.phase === 'night_detective';
 
+  // We key on a coarse "scene" so transitions only fire when the visible
+  // component actually changes — flipping between night_mafia/doctor/detective
+  // shouldn't re-trigger a fade since NightPhase stays mounted.
+  const scene = isNight
+    ? 'night'
+    : room.phase === 'day_recap'
+      ? 'recap'
+      : room.phase === 'day_discussion'
+        ? 'discussion'
+        : room.phase === 'day_vote'
+          ? 'vote'
+          : room.phase === 'end'
+            ? 'end'
+            : 'shell';
+
+  let content: React.ReactNode;
   if (isNight) {
-    return <NightPhase room={room} myId={myId} myRole={myRole} />;
+    content = <NightPhase room={room} myId={myId} myRole={myRole} />;
+  } else if (room.phase === 'day_recap') {
+    content = <DayRecap room={room} />;
+  } else if (room.phase === 'day_discussion') {
+    content = <DayDiscussion room={room} myId={myId} />;
+  } else if (room.phase === 'day_vote') {
+    content = <DayVote room={room} myId={myId} />;
+  } else if (room.phase === 'end') {
+    content = <GameEnd room={room} myId={myId} />;
+  } else {
+    content = <GenericShell room={room} myId={myId} />;
   }
 
-  if (room.phase === 'day_recap') {
-    return <DayRecap room={room} />;
-  }
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div key={scene} {...fade}>
+        {content}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
-  if (room.phase === 'day_discussion') {
-    return <DayDiscussion room={room} myId={myId} />;
-  }
-
-  if (room.phase === 'day_vote') {
-    return <DayVote room={room} myId={myId} />;
-  }
-
-  if (room.phase === 'end') {
-    return <GameEnd room={room} myId={myId} />;
-  }
-
-  // role_assign + (future) day_discussion / day_vote — generic in-game shell.
+function GenericShell({ room, myId }: { room: RoomView; myId: string | null }) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-6">
       <header className="flex items-baseline justify-between">
