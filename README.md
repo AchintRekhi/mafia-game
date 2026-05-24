@@ -1,6 +1,6 @@
 # Mafia Game
 
-A web-based [Mafia (party game)](https://en.wikipedia.org/wiki/Mafia_(party_game)) clone where the app itself is the Narrator. Built for 6–12 players with live video, voice, and text chat.
+A web-based [Mafia (party game)](https://mafia-game-web-6dn4.vercel.app/) clone where the app itself is the Narrator. Built for 6–12 players with live video, voice, and text chat.
 
 ## Tech stack
 
