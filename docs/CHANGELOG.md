@@ -4,6 +4,12 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- **Testing phase 2 — regression test suite:**
+  - **`vitest` unit tests (39, server, always in CI)** covering the pure game logic: `resolver` (Mafia kill vs Doctor save, no-pick, Detective result, win checks, vote plurality/tie/abstain), `roles` (balance table 6–12 + throws + `assignRoles`), `rooms/view` asymmetric visibility — the anti-cheat core (Mafia see Mafia, town see nothing, dead see the dead, per-viewer `myVote` + night slice), `rooms/code` (length/alphabet/uniqueness), and `rooms/store` (join gating, name collision, `startGame` gating, host migration, and the reconnect identity rewrite of votes/night/host). Added `vitest.config.ts` with a small pre-resolver so NodeNext `.js` imports resolve to their `.ts` source.
+  - **Playwright e2e (real LiveKit + fake media):** `grid.spec` asserts every player gets their own tile at a 4:3 ratio on both laptop and phone (regression guard for the reported video bug); `flow.spec` drives a real 6-player game from the deal through all three night sub-phases, the dawn recap, and discussion to the day vote, exercising the FSM + resolver end-to-end. Shared `e2e/helpers.ts` seats N players and drives night/vote actions.
+  - `playwright.config.ts` now launches Chromium with fake-media flags and documents that specs use real LiveKit when configured (never mocked) and degrade to the static grid otherwise.
+
 ### Fixed
 - **Testing phase 1 — full-game bug sweep (drove a real 6-player game through every FSM step on mixed phone/laptop viewports):**
   - Video tiles rendered solid black when a camera track was published-but-not-yet-subscribed (or frameless). `GameTable` now requires an attached `publication.track` before showing `<VideoTrack>`, so such tiles fall back to the avatar / "CAMERA OFF" state instead of painting black.
