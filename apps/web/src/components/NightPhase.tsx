@@ -5,6 +5,7 @@ import type { Role, RoomView } from '@mafia/shared';
 import { getSocket } from '@/lib/socket';
 import { useGame } from '@/lib/store';
 import { TopBar } from './TopBar';
+import { GameTable } from './GameTable';
 
 interface Props {
   room: RoomView;
@@ -22,64 +23,50 @@ const COPY: Record<Role, { title: string; prompt: string }> = {
 export function NightPhase({ room, myId, myRole }: Props) {
   const me = room.players.find((p) => p.id === myId);
   const isMyTurn =
-    me?.alive &&
-    ((room.phase === 'night_mafia' && me.role === 'mafia') ||
-      (room.phase === 'night_doctor' && me.role === 'doctor') ||
-      (room.phase === 'night_detective' && me.role === 'detective'));
+    (me?.alive &&
+      ((room.phase === 'night_mafia' && me.role === 'mafia') ||
+        (room.phase === 'night_doctor' && me.role === 'doctor') ||
+        (room.phase === 'night_detective' && me.role === 'detective'))) ||
+    false;
 
   const copy = myRole ? COPY[myRole] : COPY.civilian;
-  const livingTargets = room.players.filter((p) => p.alive);
-  const alive = livingTargets.length;
-
-  // Current pick (only visible to actor's role).
+  const alive = room.players.filter((p) => p.alive).length;
   const currentPick = currentTargetFor(room);
 
+  // The actor picks a living player. Only the Doctor may target self.
+  const allowSelf = me?.role === 'doctor';
+  const selectableIds = new Set(
+    isMyTurn
+      ? room.players.filter((p) => p.alive && (allowSelf || p.id !== myId)).map((p) => p.id)
+      : [],
+  );
+  // Mafia see their teammates flagged.
+  const allyIds =
+    me?.role === 'mafia'
+      ? new Set(room.players.filter((p) => p.role === 'mafia').map((p) => p.id))
+      : undefined;
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex min-h-screen flex-col"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex min-h-screen flex-col">
       <TopBar code={room.code} phaseLabel="Night" phaseTone="blush" aliveCount={alive} />
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-6 py-8">
         <h2 className="font-display text-3xl tracking-[0.14em] text-parchment">{copy.title}</h2>
-
         <p className="animate-fade-in text-sm uppercase tracking-[0.24em] text-blush">
           {isMyTurn ? copy.prompt : 'The town sleeps.'}
         </p>
 
-        {isMyTurn ? (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {livingTargets.map((p) => {
-              const picked = currentPick === p.id;
-              const isSelf = p.id === myId;
-              // Mafia can't kill themselves; Detective shouldn't investigate self (no info).
-              const allowSelf = me?.role === 'doctor';
-              const disabled = isSelf && !allowSelf;
-              return (
-                <li key={p.id}>
-                  <button
-                    disabled={disabled}
-                    onClick={() => submit(room.phase, p.id)}
-                    className={`w-full border bg-gradient-to-br from-[#1a120a] to-[#0e0906] px-3.5 py-3 text-left text-[13px] tracking-[0.1em] text-parchment brightness-[0.85] transition ${
-                      picked
-                        ? 'border-gold shadow-[0_0_0_2px_rgba(217,156,74,0.85),0_0_30px_rgba(217,156,74,0.25)] brightness-100'
-                        : 'border-gold/[0.16] hover:border-gold/70'
-                    } disabled:cursor-not-allowed disabled:opacity-40`}
-                  >
-                    {p.name}
-                    {isSelf && (
-                      <span className="ml-2 text-[10px] tracking-[0.2em] text-parchment/40">
-                        (you)
-                      </span>
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
+        <GameTable
+          players={room.players}
+          myId={myId}
+          selectableIds={selectableIds}
+          selectedId={currentPick}
+          onSelect={(id) => submit(room.phase, id)}
+          allyIds={allyIds}
+          dimUnselectable
+        />
+
+        {!isMyTurn && (
           <p className="text-center text-sm font-light tracking-[0.08em] text-parchment/40">
             Eyes closed. Mics muted, please.
           </p>

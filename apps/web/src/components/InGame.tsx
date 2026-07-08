@@ -2,8 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Role, RoomView } from '@mafia/shared';
-import { VideoRoom } from './VideoRoom';
-import { RoleChip } from './RoleChip';
+import { GameTable } from './GameTable';
 import { TopBar } from './TopBar';
 import { NightPhase } from './NightPhase';
 import { DayRecap } from './DayRecap';
@@ -80,27 +79,9 @@ function GenericShell({ room, myId }: { room: RoomView; myId: string | null }) {
         endsAt={room.phaseEndsAt}
       />
 
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-6">
-        <VideoRoom />
-
-        <section>
-          <h2 className="mb-3 text-xs uppercase tracking-[0.32em] text-parchment/55">The town</h2>
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {room.players.map((p) => (
-              <li
-                key={p.id}
-                className={`flex items-center justify-between gap-2 border bg-gradient-to-br from-[#1a120a] to-[#0e0906] px-3.5 py-2.5 ${
-                  p.alive ? 'border-gold/[0.16]' : 'border-parchment/10 opacity-55 grayscale'
-                } ${p.id === myId ? 'border-gold/70' : ''}`}
-              >
-                <span className="truncate text-[13px] tracking-[0.1em] text-parchment">
-                  {p.alive ? p.name : `✝ ${p.name}`}
-                </span>
-                <RoleChip role={p.role} hidden={p.role === null} />
-              </li>
-            ))}
-          </ul>
-        </section>
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-6 py-6">
+        <h2 className="text-xs uppercase tracking-[0.32em] text-parchment/55">The town</h2>
+        <GameTable players={room.players} myId={myId} showRoleChip showControls />
       </div>
     </main>
   );

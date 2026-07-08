@@ -5,6 +5,11 @@ All notable changes to this project will be documented here. Format follows [Kee
 ## [Unreleased]
 
 ### Added
+- **Unified per-player video grid (testing phase 0 — fixes the phone/laptop tile-ratio bug):**
+  - Replaced the two-grid split (a separate LiveKit `GridLayout` at `h-[60vh]` + a video-less name-card grid) with ONE grid where each player is a fixed `aspect-[4/3]` tile holding their own video, name bar, role/ally tag, live vote badge, and mic/speaking indicator — the layout the imported design specifies.
+  - New `PlayerTile` (presentational tile chrome) and `GameTable` (LiveKit wrapper: matches `participant.identity` → `player.id`, renders each participant's `<VideoTrack>` with `object-cover` so the aspect ratio is identical on every device; falls back to a video-less static grid when LiveKit is unavailable so the game stays playable). Removed `VideoRoom`.
+  - Rewired Lobby, InGame shell, DayDiscussion, DayVote, NightPhase, and GameEnd onto `GameTable`. Night selection, day-vote tally badges, Mafia ally tags, and dead/dim states are driven by per-phase config props.
+  - Verified with a 6-browser fake-media smoke: identical 4:3 tiles on a 1440px laptop and a 390px phone; each participant's video stays within their own tile. Lobby e2e still green.
 - **Speakeasy-noir theme (imported claude.ai/design "MAFIA Game" project):**
   - Global restyle to a 1932 speakeasy look: `Limelight` display + `Josefin Sans` body fonts, ink `#0b0805` / parchment `#efe6d3` / gold `#d99c4a` / noir-red `#b8402e` palette, sharp corners, uppercase letter-spaced labels.
   - `Ambience` component: full-viewport blurred photo backdrop (`apps/web/public/ambience.png`, the Gemini image from the design) + flickering lamp-glow vignette + animated film grain, rendered behind every screen via the root layout.

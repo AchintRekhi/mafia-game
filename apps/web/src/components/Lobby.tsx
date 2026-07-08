@@ -1,7 +1,7 @@
 'use client';
 
 import type { RoomView, TimingPreset } from '@mafia/shared';
-import { VideoRoom } from './VideoRoom';
+import { GameTable } from './GameTable';
 import { TopBar } from './TopBar';
 import { getSocket } from '@/lib/socket';
 
@@ -28,37 +28,17 @@ export function Lobby({ room, myId }: Props) {
     <main className="flex min-h-screen flex-col">
       <TopBar code={room.code} phaseLabel="Lobby · waiting" />
 
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-6">
-        <VideoRoom />
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-6 py-6">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xs uppercase tracking-[0.32em] text-parchment/55">
+            At the table · {room.players.length}/{MAX_PLAYERS}
+          </h2>
+          <span className="text-xs tracking-[0.14em] text-parchment/40">
+            Need {MIN_PLAYERS}+ to deal
+          </span>
+        </div>
 
-        <section className="space-y-3">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-xs uppercase tracking-[0.32em] text-parchment/55">
-              At the table · {room.players.length}/{MAX_PLAYERS}
-            </h2>
-            <span className="text-xs tracking-[0.14em] text-parchment/40">
-              Need {MIN_PLAYERS}+ to deal
-            </span>
-          </div>
-
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {room.players.map((p) => (
-              <li
-                key={p.id}
-                className={`border bg-gradient-to-br from-[#1a120a] to-[#0e0906] px-3.5 py-2.5 text-parchment ${
-                  p.isMe ? 'border-gold/70' : 'border-gold/[0.16]'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="truncate text-[13px] tracking-[0.1em]">{p.name}</span>
-                  {p.isHost && (
-                    <span className="text-[9px] uppercase tracking-[0.3em] text-gold">Host</span>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <GameTable players={room.players} myId={myId} hostBadge showControls />
       </div>
 
       <footer className="flex flex-col items-center gap-4 border-t border-gold/[0.18] bg-ink/60 px-[26px] py-4 backdrop-blur">

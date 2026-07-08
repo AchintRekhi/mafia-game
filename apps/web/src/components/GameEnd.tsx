@@ -5,7 +5,7 @@ import type { RoomView } from '@mafia/shared';
 import { useGame } from '@/lib/store';
 import { getSocket } from '@/lib/socket';
 import { RoleChip } from './RoleChip';
-import { VideoRoom } from './VideoRoom';
+import { GameTable } from './GameTable';
 
 interface Props {
   room: RoomView;
@@ -49,7 +49,7 @@ export function GameEnd({ room, myId }: Props) {
       </p>
 
       <section className="w-full">
-        <VideoRoom />
+        <GameTable players={room.players} myId={myId} showControls />
       </section>
 
       <section className="w-full">
