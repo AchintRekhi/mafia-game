@@ -24,7 +24,7 @@ export function RoleChip({ role, hidden, size = 'sm' }: Props) {
   if (hidden || !role) {
     return (
       <span
-        className={`inline-flex items-center gap-1 rounded-sm border border-stone-700 bg-stone-900 font-display tracking-widest text-stone-500 ${text} ${pad}`}
+        className={`inline-flex items-center gap-1 border border-parchment/[0.22] bg-ink/70 font-display tracking-widest text-parchment/40 ${text} ${pad}`}
       >
         ???
       </span>
@@ -32,7 +32,7 @@ export function RoleChip({ role, hidden, size = 'sm' }: Props) {
   }
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-sm font-display tracking-widest text-stone-50 ${text} ${pad}`}
+      className={`inline-flex items-center gap-1 font-display tracking-widest text-stone-50 ${text} ${pad}`}
       style={{ backgroundColor: ROLE_COLOR[role] }}
     >
       {LABEL[role]}

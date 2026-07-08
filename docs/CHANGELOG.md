@@ -5,6 +5,14 @@ All notable changes to this project will be documented here. Format follows [Kee
 ## [Unreleased]
 
 ### Added
+- **Speakeasy-noir theme (imported claude.ai/design "MAFIA Game" project):**
+  - Global restyle to a 1932 speakeasy look: `Limelight` display + `Josefin Sans` body fonts, ink `#0b0805` / parchment `#efe6d3` / gold `#d99c4a` / noir-red `#b8402e` palette, sharp corners, uppercase letter-spaced labels.
+  - `Ambience` component: full-viewport blurred photo backdrop (`apps/web/public/ambience.png`, the Gemini image from the design) + flickering lamp-glow vignette + animated film grain, rendered behind every screen via the root layout.
+  - `TopBar` component: shared in-game header (MAFIA brand, phase label, glow-pulse timer, alive count, copy-code button) used by Lobby, day/night phases, and the generic shell.
+  - Landing rebuilt per the design: "Est. 1932" kicker, glowing MAFIA title, "Trust no one" divider, single noir panel with name input, gold "Create a room", and room-code join.
+  - Role reveal restyled as the design's dealt card (gradient card, gold border, role-colored Limelight title); Mafia now see their associates' names on the card.
+  - Day vote tally now renders as the design's round red vote badges; chat panel restyled as "Table talk" (ghost variant: "Beyond the grave"); game end restyled ("The town falls silent" + red/gold winner title); night phase, recap overlay, and LiveKit tiles/controls skinned to match.
+  - `CLAUDE.md` UI conventions updated to the new fonts/palette; e2e lobby spec updated for the new landing copy ("e.g. Corleone", "Create a room" / "Join room").
 - Initial project scaffold: pnpm monorepo with `apps/web`, `apps/server`, `packages/shared`.
 - Project docs: `ARCHITECTURE.md`, `ROLES.md`, `GAME_STATES.md`, three ADRs.
 - `CLAUDE.md` with branching rule (PR-review before merge to `main`; branch by milestone).

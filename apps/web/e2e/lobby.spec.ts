@@ -15,8 +15,8 @@ async function createRoom(browser: Browser, hostName: string) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await page.goto('/');
-  await page.getByPlaceholder('e.g. Achint').fill(hostName);
-  await page.getByRole('button', { name: 'Create' }).click();
+  await page.getByPlaceholder('e.g. Corleone').fill(hostName);
+  await page.getByRole('button', { name: 'Create a room' }).click();
   await page.waitForURL(/\/room\/[A-Z0-9]{6}/, { timeout: 10_000 });
   const code = page.url().split('/').pop()!;
   return { ctx, page, code };
@@ -26,9 +26,9 @@ async function joinRoom(browser: Browser, code: string, name: string) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await page.goto('/');
-  await page.getByPlaceholder('e.g. Achint').fill(name);
+  await page.getByPlaceholder('e.g. Corleone').fill(name);
   await page.getByPlaceholder('ABC123').fill(code);
-  await page.getByRole('button', { name: 'Join' }).click();
+  await page.getByRole('button', { name: 'Join room' }).click();
   await page.waitForURL(`/room/${code}`, { timeout: 10_000 });
   return { ctx, page };
 }
@@ -53,9 +53,9 @@ test('joining with a bad code surfaces an error', async ({ browser }) => {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await page.goto('/');
-  await page.getByPlaceholder('e.g. Achint').fill('Achint');
+  await page.getByPlaceholder('e.g. Corleone').fill('Achint');
   await page.getByPlaceholder('ABC123').fill('ZZZZZZ');
-  await page.getByRole('button', { name: 'Join' }).click();
+  await page.getByRole('button', { name: 'Join room' }).click();
   await expect(page.getByText(/Room not found/i)).toBeVisible({ timeout: 5_000 });
   await ctx.close();
 });

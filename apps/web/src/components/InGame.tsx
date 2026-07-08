@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Role, RoomView } from '@mafia/shared';
 import { VideoRoom } from './VideoRoom';
 import { RoleChip } from './RoleChip';
-import { PhaseTimer } from './PhaseTimer';
+import { TopBar } from './TopBar';
 import { NightPhase } from './NightPhase';
 import { DayRecap } from './DayRecap';
 import { DayDiscussion } from './DayDiscussion';
@@ -70,42 +70,38 @@ export function InGame({ room, myId, myRole }: Props) {
 }
 
 function GenericShell({ room, myId }: { room: RoomView; myId: string | null }) {
+  const alive = room.players.filter((p) => p.alive).length;
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-6">
-      <header className="flex items-baseline justify-between">
-        <p className="font-display text-2xl tracking-widest text-stone-100">{room.code}</p>
-        <div className="flex items-center gap-4">
-          <p className="text-xs uppercase tracking-widest text-stone-400">
-            {room.phase.replace('_', ' ')}
-          </p>
-          <PhaseTimer endsAt={room.phaseEndsAt} />
-        </div>
-      </header>
+    <main className="flex min-h-screen flex-col">
+      <TopBar
+        code={room.code}
+        phaseLabel={room.phase.replace('_', ' ')}
+        aliveCount={alive}
+        endsAt={room.phaseEndsAt}
+      />
 
-      <VideoRoom />
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-6">
+        <VideoRoom />
 
-      <section>
-        <h2 className="mb-3 font-display text-lg tracking-wider text-stone-100">
-          Players ({room.players.filter((p) => p.alive).length} alive)
-        </h2>
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {room.players.map((p) => (
-            <li
-              key={p.id}
-              className={`flex items-center justify-between gap-2 rounded border px-3 py-2 ${
-                p.alive
-                  ? 'border-stone-800 bg-stone-950/60'
-                  : 'border-stone-900 bg-stone-950/40 opacity-50'
-              } ${p.id === myId ? 'ring-1 ring-mafia' : ''}`}
-            >
-              <span className="truncate text-stone-100">
-                {p.alive ? p.name : `✝ ${p.name}`}
-              </span>
-              <RoleChip role={p.role} hidden={p.role === null} />
-            </li>
-          ))}
-        </ul>
-      </section>
+        <section>
+          <h2 className="mb-3 text-xs uppercase tracking-[0.32em] text-parchment/55">The town</h2>
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {room.players.map((p) => (
+              <li
+                key={p.id}
+                className={`flex items-center justify-between gap-2 border bg-gradient-to-br from-[#1a120a] to-[#0e0906] px-3.5 py-2.5 ${
+                  p.alive ? 'border-gold/[0.16]' : 'border-parchment/10 opacity-55 grayscale'
+                } ${p.id === myId ? 'border-gold/70' : ''}`}
+              >
+                <span className="truncate text-[13px] tracking-[0.1em] text-parchment">
+                  {p.alive ? p.name : `✝ ${p.name}`}
+                </span>
+                <RoleChip role={p.role} hidden={p.role === null} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </main>
   );
 }

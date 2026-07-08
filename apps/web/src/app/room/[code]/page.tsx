@@ -80,8 +80,8 @@ export default function RoomPage({ params }: Props) {
 
   if (!room) {
     return (
-      <main className="flex min-h-screen items-center justify-center text-stone-400">
-        Connecting to room <span className="ml-2 font-display tracking-widest">{code}</span>…
+      <main className="flex min-h-screen items-center justify-center text-sm font-light tracking-[0.08em] text-parchment/50">
+        Connecting to room <span className="ml-2 font-display tracking-widest text-gold">{code}</span>…
       </main>
     );
   }

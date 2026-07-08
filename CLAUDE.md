@@ -18,7 +18,8 @@ pnpm e2e         # e2e tests
 - LiveKit Cloud handles all video/voice. Server mints tokens and mutes tracks when a player dies.
 
 ## UI conventions
-- Fonts: `Cinzel` / `Special Elite` for headings and role chips. `Inter` for body.
+- Theme: 1932 speakeasy noir (imported claude.ai/design "MAFIA Game" project). Ink `#0b0805` bg, parchment `#efe6d3` text, gold `#d99c4a` accent, noir red `#b8402e`. Sharp corners, uppercase letter-spaced labels, blurred `ambience.png` backdrop on every screen.
+- Fonts: `Limelight` for display/headings and role chips. `Josefin Sans` for body.
 - Role colors (keep in sync with `packages/shared/src/roles.ts`):
   - Mafia → `#B91C1C`
   - Detective → `#4F46E5`

@@ -19,8 +19,11 @@ export function PhaseTimer({ endsAt }: { endsAt: number | null }) {
   const m = Math.floor(remaining / 60);
   const s = remaining % 60;
   return (
-    <span className="font-display text-lg tracking-widest text-stone-300 tabular-nums">
-      {m}:{s.toString().padStart(2, '0')}
+    <span className="flex items-center gap-2.5">
+      <span className="h-2 w-2 animate-glow-pulse rounded-full bg-gold" />
+      <span className="text-[22px] font-semibold tracking-[0.12em] text-parchment tabular-nums">
+        {m}:{s.toString().padStart(2, '0')}
+      </span>
     </span>
   );
 }

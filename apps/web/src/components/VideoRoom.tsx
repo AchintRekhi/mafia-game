@@ -34,10 +34,10 @@ export function VideoRoom() {
 
   if (error) {
     return (
-      <div className="rounded border border-stone-800 bg-stone-950/60 p-4 text-sm text-stone-400">
-        <p className="font-display tracking-wider text-stone-200">Video unavailable</p>
+      <div className="border border-gold/[0.18] bg-ink/60 p-4 text-sm font-light text-parchment/60 backdrop-blur">
+        <p className="font-display tracking-wider text-parchment">Video unavailable</p>
         <p>{error}</p>
-        <p className="mt-2 text-xs text-stone-500">
+        <p className="mt-2 text-xs text-parchment/40">
           Set <code>LIVEKIT_URL</code>, <code>LIVEKIT_API_KEY</code>,{' '}
           <code>LIVEKIT_API_SECRET</code> in <code>apps/server/.env</code> and{' '}
           <code>NEXT_PUBLIC_LIVEKIT_URL</code> in <code>apps/web/.env.local</code>.
@@ -48,7 +48,7 @@ export function VideoRoom() {
 
   if (!info) {
     return (
-      <div className="rounded border border-stone-800 bg-stone-950/60 p-4 text-sm text-stone-500">
+      <div className="border border-gold/[0.18] bg-ink/60 p-4 text-sm font-light text-parchment/50 backdrop-blur">
         Joining video room…
       </div>
     );
@@ -62,7 +62,7 @@ export function VideoRoom() {
       audio
       video
       data-lk-theme="default"
-      className="rounded-lg border border-stone-800 bg-black"
+      className="border border-gold/[0.18] bg-ink shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
     >
       <VideoGrid />
       <RoomAudioRenderer />

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import type { Role, RoomView } from '@mafia/shared';
 import { getSocket } from '@/lib/socket';
 import { useGame } from '@/lib/store';
+import { TopBar } from './TopBar';
 
 interface Props {
   room: RoomView;
@@ -12,8 +13,8 @@ interface Props {
 }
 
 const COPY: Record<Role, { title: string; prompt: string }> = {
-  mafia: { title: 'Mafia, awake.', prompt: 'Choose your kill.' },
-  doctor: { title: 'Doctor, awake.', prompt: 'Save one person tonight.' },
+  mafia: { title: 'Mafia, awake.', prompt: 'Choose your mark. The town sleeps.' },
+  doctor: { title: 'Doctor, awake.', prompt: 'Save one soul tonight.' },
   detective: { title: 'Detective, awake.', prompt: 'Investigate one player.' },
   civilian: { title: 'Night falls.', prompt: 'Stay silent until dawn.' },
 };
@@ -28,6 +29,7 @@ export function NightPhase({ room, myId, myRole }: Props) {
 
   const copy = myRole ? COPY[myRole] : COPY.civilian;
   const livingTargets = room.players.filter((p) => p.alive);
+  const alive = livingTargets.length;
 
   // Current pick (only visible to actor's role).
   const currentPick = currentTargetFor(room);
@@ -36,43 +38,53 @@ export function NightPhase({ room, myId, myRole }: Props) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-6 px-6 py-10 text-stone-200"
+      className="flex min-h-screen flex-col"
     >
-      <header className="flex items-baseline justify-between">
-        <h2 className="font-display text-3xl tracking-widest">{copy.title}</h2>
-      </header>
+      <TopBar code={room.code} phaseLabel="Night" phaseTone="blush" aliveCount={alive} />
 
-      <p className="text-stone-400">{isMyTurn ? copy.prompt : 'The town sleeps.'}</p>
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+        <h2 className="font-display text-3xl tracking-[0.14em] text-parchment">{copy.title}</h2>
 
-      {isMyTurn ? (
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {livingTargets.map((p) => {
-            const picked = currentPick === p.id;
-            const isSelf = p.id === myId;
-            // Mafia can't kill themselves; Detective shouldn't investigate self (no info).
-            const allowSelf = me?.role === 'doctor';
-            const disabled = isSelf && !allowSelf;
-            return (
-              <li key={p.id}>
-                <button
-                  disabled={disabled}
-                  onClick={() => submit(room.phase, p.id)}
-                  className={`w-full rounded border px-3 py-2 text-left text-sm ${
-                    picked
-                      ? 'border-mafia bg-mafia/15 text-stone-50'
-                      : 'border-stone-800 bg-stone-950/60 hover:border-stone-600'
-                  } disabled:cursor-not-allowed disabled:opacity-40`}
-                >
-                  {p.name}
-                  {isSelf && <span className="ml-2 text-[10px] text-stone-500">(you)</span>}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className="text-center text-sm text-stone-500">Eyes closed. Mics muted, please.</p>
-      )}
+        <p className="animate-fade-in text-sm uppercase tracking-[0.24em] text-blush">
+          {isMyTurn ? copy.prompt : 'The town sleeps.'}
+        </p>
+
+        {isMyTurn ? (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {livingTargets.map((p) => {
+              const picked = currentPick === p.id;
+              const isSelf = p.id === myId;
+              // Mafia can't kill themselves; Detective shouldn't investigate self (no info).
+              const allowSelf = me?.role === 'doctor';
+              const disabled = isSelf && !allowSelf;
+              return (
+                <li key={p.id}>
+                  <button
+                    disabled={disabled}
+                    onClick={() => submit(room.phase, p.id)}
+                    className={`w-full border bg-gradient-to-br from-[#1a120a] to-[#0e0906] px-3.5 py-3 text-left text-[13px] tracking-[0.1em] text-parchment brightness-[0.85] transition ${
+                      picked
+                        ? 'border-gold shadow-[0_0_0_2px_rgba(217,156,74,0.85),0_0_30px_rgba(217,156,74,0.25)] brightness-100'
+                        : 'border-gold/[0.16] hover:border-gold/70'
+                    } disabled:cursor-not-allowed disabled:opacity-40`}
+                  >
+                    {p.name}
+                    {isSelf && (
+                      <span className="ml-2 text-[10px] tracking-[0.2em] text-parchment/40">
+                        (you)
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-center text-sm font-light tracking-[0.08em] text-parchment/40">
+            Eyes closed. Mics muted, please.
+          </p>
+        )}
+      </div>
     </motion.div>
   );
 }
