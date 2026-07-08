@@ -45,7 +45,7 @@ export function DayVote({ room, myId }: Props) {
             selectedId={myVote}
             onSelect={submit}
             voteTally={tally}
-            showControls
+            showControls={!!me?.alive}
           />
           <div className="flex justify-end">
             <button

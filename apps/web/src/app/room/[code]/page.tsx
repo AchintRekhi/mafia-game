@@ -87,13 +87,13 @@ export default function RoomPage({ params }: Props) {
   }
 
   return (
-    <>
+    <div data-phase={room.phase} data-my-role={myRole ?? ''}>
       {room.phase === 'lobby' ? (
         <Lobby room={room} myId={myId} />
       ) : (
         <InGame room={room} myId={myId} myRole={myRole} />
       )}
       <AnimatePresence>{showReveal && myRole && <RoleReveal role={myRole} />}</AnimatePresence>
-    </>
+    </div>
   );
 }

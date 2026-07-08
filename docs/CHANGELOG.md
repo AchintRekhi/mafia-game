@@ -4,6 +4,14 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+- **Testing phase 1 — full-game bug sweep (drove a real 6-player game through every FSM step on mixed phone/laptop viewports):**
+  - Video tiles rendered solid black when a camera track was published-but-not-yet-subscribed (or frameless). `GameTable` now requires an attached `publication.track` before showing `<VideoTrack>`, so such tiles fall back to the avatar / "CAMERA OFF" state instead of painting black.
+  - Dead ("spectating") players were still shown the mic/camera control bar. Controls are now hidden for the dead in day discussion/vote (server already blocked publishing; this fixes the misleading UI).
+  - `TopBar` overflowed on a 390px phone — the room code was clipped off the right edge and the phase label cramped. It now wraps responsively (timer drops to its own centered row, smaller brand/label/padding on mobile) so nothing is clipped.
+  - Added test affordances used by the sweep and the upcoming e2e suite: `data-player-id` / `data-selectable` / `data-selected` / `data-dead` on each `PlayerTile`, and `data-phase` / `data-my-role` on the room shell.
+  - Verified end-to-end: reveal → night (mafia/doctor/detective) → recap → discussion → vote → resolve → loop → win, including a natural TOWN WINS with a correct role-reveal grid. Lobby e2e still green.
+
 ### Added
 - **Unified per-player video grid (testing phase 0 — fixes the phone/laptop tile-ratio bug):**
   - Replaced the two-grid split (a separate LiveKit `GridLayout` at `h-[60vh]` + a video-less name-card grid) with ONE grid where each player is a fixed `aspect-[4/3]` tile holding their own video, name bar, role/ally tag, live vote badge, and mic/speaking indicator — the layout the imported design specifies.

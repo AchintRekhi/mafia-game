@@ -25,7 +25,12 @@ export function DayDiscussion({ room, myId }: Props) {
       <div className="mx-auto grid w-full max-w-5xl flex-1 gap-5 px-6 py-6 md:grid-cols-[1fr_300px]">
         <section className="flex flex-col gap-4">
           <h2 className="text-xs uppercase tracking-[0.32em] text-parchment/55">The town</h2>
-          <GameTable players={room.players} myId={myId} showRoleChip showControls />
+          <GameTable
+            players={room.players}
+            myId={myId}
+            showRoleChip
+            showControls={!!me?.alive}
+          />
         </section>
 
         <section>

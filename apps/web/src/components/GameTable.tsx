@@ -48,6 +48,7 @@ function baseTileProps(
   const selected = cfg.selectedId != null && cfg.selectedId === p.id;
   const allyTag = cfg.allyIds?.has(p.id) ?? false;
   return {
+    playerId: p.id,
     name: p.name,
     isMe: p.isMe,
     dead: !p.alive,
@@ -83,7 +84,9 @@ function LiveTile({
   base: ReturnType<typeof baseTileProps>;
 }) {
   const speaking = useIsSpeaking(participant);
-  const hasVideo = !!camRef && !camRef.publication.isMuted;
+  // Require an attached track — a published-but-unsubscribed (or muted) camera
+  // has no `.track`, so we fall back to the avatar instead of painting black.
+  const hasVideo = !!camRef && !camRef.publication.isMuted && !!camRef.publication.track;
   const videoSlot = hasVideo ? (
     <VideoTrack
       trackRef={camRef}

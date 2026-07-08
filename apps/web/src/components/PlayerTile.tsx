@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 
 export interface PlayerTileProps {
+  playerId: string;
   name: string;
   isMe: boolean;
   /** The live <VideoTrack> element, or null to fall back to the avatar / cam-off state. */
@@ -31,6 +32,7 @@ function initialsOf(name: string) {
 }
 
 export function PlayerTile({
+  playerId,
   name,
   isMe,
   videoSlot,
@@ -54,6 +56,10 @@ export function PlayerTile({
 
   return (
     <div
+      data-player-id={playerId}
+      data-selectable={selectable ? 'true' : 'false'}
+      data-selected={selected ? 'true' : 'false'}
+      data-dead={dead ? 'true' : 'false'}
       onClick={selectable ? onSelect : undefined}
       className={`group relative aspect-[4/3] select-none overflow-hidden border bg-gradient-to-br from-[#1a120a] to-[#0e0906] transition ${
         selectable ? 'cursor-pointer' : 'cursor-default'

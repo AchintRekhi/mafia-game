@@ -49,7 +49,7 @@ export function GameEnd({ room, myId }: Props) {
       </p>
 
       <section className="w-full">
-        <GameTable players={room.players} myId={myId} showControls />
+        <GameTable players={room.players} myId={myId} />
       </section>
 
       <section className="w-full">
