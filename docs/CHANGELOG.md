@@ -11,6 +11,7 @@ All notable changes to this project will be documented here. Format follows [Kee
   - `playwright.config.ts` now launches Chromium with fake-media flags and documents that specs use real LiveKit when configured (never mocked) and degrade to the static grid otherwise.
 
 ### Fixed
+- **Role-reveal card overflow:** the role name spilled past the card's edges for the longest word ("DETECTIVE" — "CIVILIAN" only just fit at the old fixed 54px). The title now scales to the card via container-query units (`15cqw` on a `container-type: inline-size` card) with `whitespace-nowrap`, so every role word fits inside the card on any viewport, phones included.
 - **Testing phase 1 — full-game bug sweep (drove a real 6-player game through every FSM step on mixed phone/laptop viewports):**
   - Video tiles rendered solid black when a camera track was published-but-not-yet-subscribed (or frameless). `GameTable` now requires an attached `publication.track` before showing `<VideoTrack>`, so such tiles fall back to the avatar / "CAMERA OFF" state instead of painting black.
   - Dead ("spectating") players were still shown the mic/camera control bar. Controls are now hidden for the dead in day discussion/vote (server already blocked publishing; this fixes the misleading UI).

@@ -38,13 +38,15 @@ export function RoleReveal({ role }: { role: Role }) {
         initial={{ scale: 0.92, opacity: 0, rotateY: 92 }}
         animate={{ scale: 1, opacity: 1, rotateY: 0 }}
         transition={{ type: 'spring', stiffness: 100, damping: 14 }}
-        className="w-[min(340px,86vw)] border border-gold/45 bg-gradient-to-br from-[#1c130b] to-[#120c06] px-9 pb-10 pt-11 text-center shadow-[0_40px_100px_rgba(0,0,0,0.75),inset_0_0_60px_rgba(232,169,79,0.05)]"
+        className="w-[min(340px,86vw)] [container-type:inline-size] border border-gold/45 bg-gradient-to-br from-[#1c130b] to-[#120c06] px-9 pb-10 pt-11 text-center shadow-[0_40px_100px_rgba(0,0,0,0.75),inset_0_0_60px_rgba(232,169,79,0.05)]"
       >
         <p className="mb-[22px] text-[11px] uppercase tracking-[0.4em] text-parchment/50">
           Your role
         </p>
         <h1
-          className="font-display text-[54px] leading-none tracking-[0.08em]"
+          // Scale the title to the card so the longest role word ("DETECTIVE")
+          // fits on every viewport instead of spilling past the card edges.
+          className="whitespace-nowrap font-display text-[15cqw] leading-none tracking-[0.03em]"
           style={{ color, textShadow: `0 0 30px ${color}66` }}
         >
           {LABEL[role]}
