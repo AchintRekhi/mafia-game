@@ -34,3 +34,6 @@ test-results/
 
 # Misc
 *.local
+
+# Local session continuity (never commit — contains internal notes)
+HANDOFF.md
