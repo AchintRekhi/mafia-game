@@ -1,7 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type { ClientToServerEvents, ServerToClientEvents } from '@mafia/shared';
 import { getRoomBySocket } from '../rooms/store.js';
-import { broadcastRoom } from './lobby.js';
 
 type IO = Server<ClientToServerEvents, ServerToClientEvents>;
 type S = Socket<ClientToServerEvents, ServerToClientEvents>;
