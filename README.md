@@ -1,4 +1,4 @@
-# MAFIA — Est. 1932 🥃
+# MAFIA — Est. 1932 
 
 **Play the classic party game [Mafia](https://en.wikipedia.org/wiki/Mafia_(party_game)) over live video — no human narrator needed. The app runs the whole game.**
 
